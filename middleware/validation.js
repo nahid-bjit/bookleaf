@@ -47,52 +47,52 @@ const userValidator = {
     ],
 };
 
-// const productValidator = {
-//     add: [
-//         body("title")
-//             .exists()
-//             .withMessage("Product title must be provided")
-//             .bail()
-//             .isString()
-//             .withMessage("Product title must be a string")
-//             .bail()
-//             .isLength({ min: 10 })
-//             .withMessage("Product title must be at least 10 characters long"),
-//         body("description")
-//             .exists()
-//             .withMessage("Product description must be provided")
-//             .bail()
-//             .isString()
-//             .withMessage("Product description must be a string")
-//             .bail()
-//             .isLength({ min: 30 })
-//             .withMessage("Product description must be at least 30 characters long"),
-//         body("price")
-//             .exists()
-//             .withMessage("Product price must be provided")
-//             .bail()
-//             .isNumeric()
-//             .withMessage("Product price must be a number")
-//             .bail()
-//             .isFloat({ min: 1 })
-//             .withMessage("Product price must be greater than 0"),
-//         body("stock")
-//             .exists()
-//             .withMessage("Product stock must be provided")
-//             .bail()
-//             .isNumeric()
-//             .withMessage("Product stock must be a number")
-//             .bail()
-//             .isInt({ min: 1 })
-//             .withMessage("Product stock must be greater than 0"),
-//         body("brand")
-//             .exists()
-//             .withMessage("Product stock must be provided")
-//             .bail()
-//             .isString()
-//             .withMessage("Product brand must be a string"),
-//     ],
-// };
+const bookValidator = {
+    add: [
+        body("title")
+            .exists()
+            .withMessage("Product title must be provided")
+            .bail()
+            .isString()
+            .withMessage("Product title must be a string")
+            .bail()
+            .isLength({ min: 10 })
+            .withMessage("Product title must be at least 10 characters long"),
+        body("description")
+            .exists()
+            .withMessage("Product description must be provided")
+            .bail()
+            .isString()
+            .withMessage("Product description must be a string")
+            .bail()
+            .isLength({ min: 30 })
+            .withMessage("Product description must be at least 30 characters long"),
+        body("price")
+            .exists()
+            .withMessage("Product price must be provided")
+            .bail()
+            .isNumeric()
+            .withMessage("Product price must be a number")
+            .bail()
+            .isFloat({ min: 1 })
+            .withMessage("Product price must be greater than 0"),
+        body("stock")
+            .exists()
+            .withMessage("Product stock must be provided")
+            .bail()
+            .isNumeric()
+            .withMessage("Product stock must be a number")
+            .bail()
+            .isInt({ min: 1 })
+            .withMessage("Product stock must be greater than 0"),
+        body("brand")
+            .exists()
+            .withMessage("Product stock must be provided")
+            .bail()
+            .isString()
+            .withMessage("Product brand must be a string"),
+    ],
+};
 
 // const cartValidator = {
 //     addRemoveItemCart: [
@@ -202,4 +202,4 @@ const authValidator = {
 
 // module.exports = { userValidator, authValidator, productValidator, cartValidator };
 
-module.exports = { userValidator, authValidator };
+module.exports = { userValidator, authValidator, bookValidator };

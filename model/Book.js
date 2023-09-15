@@ -13,8 +13,7 @@ const bookSchema = new mongoose.Schema({
     author: String,
     description: String,
     price: Number,
-    stock: Number,
-    reviews: [reviewSchema], // Embed reviews as an array of objects
+    stock: Number
 });
 
 // Create the Book model
