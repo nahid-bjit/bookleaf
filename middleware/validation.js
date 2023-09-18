@@ -94,28 +94,28 @@ const bookValidator = {
     ],
 };
 
-// const cartValidator = {
-//     addRemoveItemCart: [
-//         body("userId")
-//             .exists()
-//             .withMessage("User ID must be provided")
-//             .bail()
-//             .matches(/^[a-f\d]{24}$/i)
-//             .withMessage("ID is not in valid mongoDB format"),
-//         body("productId")
-//             .exists()
-//             .withMessage("Product ID must be provided")
-//             .bail()
-//             .matches(/^[a-f\d]{24}$/i)
-//             .withMessage("ID is not in valid mongoDB format"),
-//         body("amount")
-//             .exists()
-//             .withMessage("Product quantity must be provided")
-//             .bail()
-//             .isInt({ min: 1 })
-//             .withMessage("Quantity must be one or above"),
-//     ],
-// };
+const cartValidator = {
+    addRemoveItemCart: [
+        body("userId")
+            .exists()
+            .withMessage("User ID must be provided")
+            .bail()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("ID is not in valid mongoDB format"),
+        body("bookId")
+            .exists()
+            .withMessage("Book ID must be provided")
+            .bail()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("ID is not in valid mongoDB format"),
+        body("amount")
+            .exists()
+            .withMessage("Book quantity must be provided")
+            .bail()
+            .isInt({ min: 1 })
+            .withMessage("Quantity must be one or above"),
+    ],
+};
 
 const authValidator = {
     signup: [
@@ -202,4 +202,4 @@ const authValidator = {
 
 // module.exports = { userValidator, authValidator, productValidator, cartValidator };
 
-module.exports = { userValidator, authValidator, bookValidator };
+module.exports = { userValidator, authValidator, bookValidator, cartValidator };

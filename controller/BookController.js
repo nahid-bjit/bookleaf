@@ -20,6 +20,25 @@ class BookController {
         }
     }
 
+    async getOneById(req, res) {
+        try {
+            const { id } = req.params;
+            const user = await BookModel.findOne({ _id: id });
+
+            if (user) {
+                // Use sendResponse to send a success response
+                sendResponse(res, HTTP_STATUS.OK, "Successfully received the user", user);
+            } else {
+                // Use sendResponse to send an error response
+                sendResponse(res, HTTP_STATUS.OK, "Book does not exist", null);
+            }
+        } catch (error) {
+            console.log(error);
+            // Use sendResponse to send an error response
+            sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error", null);
+        }
+    }
+
     async create(req, res) {
         try {
             // const validation = validationResult(req).array();
@@ -58,21 +77,19 @@ class BookController {
     async deleteById(req, res) {
         try {
             const { id } = req.params;
-            const result = await BookModel.deletetById(id); // Assuming this method returns an object with a 'success' property
+            const result = await BookModel.deleteOne({ _id: id });
 
-            if (result.success) {
+            if (result.deletedCount > 0) {
                 // Use sendResponse to send a success response
-                sendResponse(res, HTTP_STATUS.OK, "Successfully deleted the product");
+                sendResponse(res, 200, "Successfully deleted the product");
             } else {
                 // Use sendResponse to send an error response
-                sendResponse(res, HTTP_STATUS.BAD_REQUEST, "Data not found");
+                sendResponse(res, 400, "Data not found");
             }
         } catch (error) {
-            console.log(error);
             // Use sendResponse to send an error response
-
+            sendResponse(res, 500, "Internal server error");
         }
-
     }
 
     async updateById(req, res) {
@@ -91,15 +108,8 @@ class BookController {
 
             // Attempt to update the document
             const result = await BookModel.updateOne({ _id: id }, { $set: updatedData });
+            sendResponse(res, HTTP_STATUS.OK, "Successfully updated the product");
 
-            if (result && result.n > 0) {
-                // Check if at least one document was matched
-                // Use sendResponse to send a success response
-                sendResponse(res, HTTP_STATUS.OK, "Successfully updated the product");
-            } else {
-                // Use sendResponse to send an error response
-                sendResponse(res, HTTP_STATUS.BAD_REQUEST, "No changes made");
-            }
         } catch (error) {
             console.log("error: ", error);
             // Use sendResponse to send an error response

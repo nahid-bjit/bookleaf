@@ -7,6 +7,9 @@ const databaseConnection = require("./config/database");
 const BookRouter = require("./routes/Book");
 const UserRouter = require("./routes/User");
 const AuthRouter = require("./routes/Auth");
+const CartRouter = require("./routes/Cart");
+const TransactionRouter = require("./routes/Transaction");
+
 
 
 dotenv.config();
@@ -20,6 +23,10 @@ app.use(express.urlencoded({ extended: true })); // Parses data as urlencoded
 app.use("/books", BookRouter);
 app.use("/users", UserRouter);
 app.use("/auth", AuthRouter);
+app.use("/cart", CartRouter);
+app.use("/transactions", TransactionRouter);
+
+
 
 
 databaseConnection(() => {

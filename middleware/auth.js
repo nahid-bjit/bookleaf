@@ -9,7 +9,9 @@ const isAuthenticated = (req, res, next) => {
         }
         const jwt = req.headers.authorization.split(" ")[1];
         const validate = jsonwebtoken.verify(jwt, process.env.SECRET_KEY);
+
         if (validate) {
+            req.user = validate.user;
             next();
         } else {
             throw new Error();
