@@ -50,6 +50,15 @@ class CartController {
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Not enough books are in stock");
             }
 
+            // Check if the book has a valid discount
+            if (book.discountPercentage > 0) {
+                const currentDate = new Date();
+                if (currentDate <= new Date(book.discountEndDate)) {
+                    // Apply the discount to the book's price
+                    book.price -= (book.price * book.discountPercentage) / 100;
+                }
+            }
+
             if (!cart) {
                 const newCart = await CartModel.create({
                     user: userId,
@@ -80,6 +89,64 @@ class CartController {
             return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
+
+    // ## working code without the discount avail part ##
+    // async addBookToCart(req, res) {
+    //     try {
+    //         const validation = validationResult(req).array();
+    //         if (validation.length > 0) {
+    //             return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the book", validation);
+    //         }
+
+    //         const { userId, bookId, amount } = req.body;
+
+    //         const user = await UserModel.findById({ _id: userId });
+
+    //         if (!user) {
+    //             return sendResponse(res, HTTP_STATUS.NOT_FOUND, "User does not exist");
+    //         }
+
+    //         const cart = await CartModel.findOne({ user: userId });
+    //         const book = await BookModel.findById({ _id: bookId });
+
+    //         if (!book) {
+    //             return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with ID was not found");
+    //         }
+
+    //         if (book.stock < amount) {
+    //             return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Not enough books are in stock");
+    //         }
+
+    //         if (!cart) {
+    //             const newCart = await CartModel.create({
+    //                 user: userId,
+    //                 books: [{ book: bookId, quantity: amount }],
+    //                 total: book.price * amount,
+    //             });
+
+    //             if (newCart) {
+    //                 return sendResponse(res, HTTP_STATUS.OK, "Added item to existing cart", newCart);
+    //             }
+    //         }
+
+    //         const bookIndex = cart.books.findIndex((element) => String(element.book) === bookId);
+    //         if (bookIndex !== -1) {
+    //             if (book.stock < cart.books[bookIndex].quantity + amount) {
+    //                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Not enough books are in stock");
+    //             }
+    //             cart.books[bookIndex].quantity += amount;
+    //         } else {
+    //             cart.books.push({ book: bookId, quantity: amount });
+    //         }
+    //         cart.total = cart.total + book.price * amount;
+
+    //         await cart.save();
+    //         return sendResponse(res, HTTP_STATUS.CREATED, "Added item to existing cart", cart);
+    //     } catch (error) {
+    //         console.log(error);
+    //         return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
+    //     }
+    // }
 
     async removeBookFromCart(req, res) {
         try {

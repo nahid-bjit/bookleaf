@@ -20,25 +20,24 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
-        // balance: {
-        //     type: Number,
-        //     required: true,
-
-        // },
+        balance: {
+            type: Number,
+            default: 0,
+        },
         address: {
             house: String,
             road: String,
             area: {
                 type: String,
-                required: true,
+                required: false,
             },
             city: {
                 type: String,
-                required: true,
+                required: false,
             },
             country: {
                 type: String,
-                required: true,
+                required: false,
             }
         },
         verified: {

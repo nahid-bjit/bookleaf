@@ -128,7 +128,34 @@ class UserController {
         }
     }
 
+    async updateBalance(req, res) {
+        try {
+            const userId = req.params.id; // Assuming you're passing the user ID as a URL parameter
+            const newBalance = req.body.balance;
 
+            console.log("userId: ", userId);
+            console.log("newBalance: ", newBalance)
+
+            // Find the user by their ID
+            const user = await UserModel.findOne({ _id: userId });
+
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            // Update the user's balance
+            user.balance += newBalance;
+            console.log("new balance: ", newBalance)
+            // Save the updated user
+            await user.save();
+
+
+            return res.status(200).json({ message: 'Balance updated successfully' });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+    }
 
 }
 

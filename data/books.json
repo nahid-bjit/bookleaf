@@ -5,18 +5,7 @@
         "description": "A coming-of-age novel featuring Holden Caulfield.",
         "price": 12.99,
         "stock": 50,
-        "reviews": [
-            {
-                "user": "user1",
-                "text": "A classic, a must-read!",
-                "rating": 5
-            },
-            {
-                "user": "user2",
-                "text": "Enjoyed it, but not my favorite.",
-                "rating": 3
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "To Kill a Mockingbird",
@@ -24,18 +13,7 @@
         "description": "A classic novel set in the American South during the 1930s.",
         "price": 9.99,
         "stock": 40,
-        "reviews": [
-            {
-                "user": "user3",
-                "text": "One of the best books I've ever read!",
-                "rating": 5
-            },
-            {
-                "user": "user4",
-                "text": "A powerful story that leaves an impact.",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "1984",
@@ -43,18 +21,7 @@
         "description": "A dystopian novel set in a totalitarian society.",
         "price": 14.49,
         "stock": 30,
-        "reviews": [
-            {
-                "user": "user5",
-                "text": "A chilling and thought-provoking novel.",
-                "rating": 5
-            },
-            {
-                "user": "user6",
-                "text": "An important book for our times.",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "Pride and Prejudice",
@@ -62,18 +29,7 @@
         "description": "A classic romantic novel set in 19th-century England.",
         "price": 11.99,
         "stock": 45,
-        "reviews": [
-            {
-                "user": "user7",
-                "text": "A timeless love story.",
-                "rating": 5
-            },
-            {
-                "user": "user8",
-                "text": "I enjoyed the characters and their interactions.",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "The Great Gatsby",
@@ -81,18 +37,7 @@
         "description": "A novel exploring the American Dream during the Jazz Age.",
         "price": 10.99,
         "stock": 35,
-        "reviews": [
-            {
-                "user": "user9",
-                "text": "A beautiful and tragic tale.",
-                "rating": 5
-            },
-            {
-                "user": "user10",
-                "text": "Gatsby's parties are legendary!",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "Harry Potter and the Sorcerer's Stone",
@@ -100,18 +45,7 @@
         "description": "The first book in the popular Harry Potter series.",
         "price": 16.99,
         "stock": 55,
-        "reviews": [
-            {
-                "user": "user11",
-                "text": "The start of an amazing adventure.",
-                "rating": 5
-            },
-            {
-                "user": "user12",
-                "text": "A magical world that captivates readers of all ages.",
-                "rating": 5
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "Brave New World",
@@ -119,18 +53,7 @@
         "description": "A dystopian novel exploring a futuristic society.",
         "price": 13.99,
         "stock": 25,
-        "reviews": [
-            {
-                "user": "user13",
-                "text": "A thought-provoking commentary on society.",
-                "rating": 4
-            },
-            {
-                "user": "user14",
-                "text": "A cautionary tale of technological advancement.",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "The Hobbit",
@@ -138,18 +61,7 @@
         "description": "A fantasy adventure novel featuring Bilbo Baggins.",
         "price": 15.99,
         "stock": 20,
-        "reviews": [
-            {
-                "user": "user15",
-                "text": "An enchanting journey filled with memorable characters.",
-                "rating": 5
-            },
-            {
-                "user": "user16",
-                "text": "Tolkien's world-building is exceptional.",
-                "rating": 5
-            }
-        ]
+        "reviews": []
     },
     {
         "title": "The Da Vinci Code",
@@ -157,17 +69,6 @@
         "description": "A thriller novel featuring Robert Langdon.",
         "price": 14.99,
         "stock": 30,
-        "reviews": [
-            {
-                "user": "user17",
-                "text": "A fast-paced and gripping mystery.",
-                "rating": 4
-            },
-            {
-                "user": "user18",
-                "text": "Dan Brown's storytelling keeps you on the edge of your seat.",
-                "rating": 4
-            }
-        ]
+        "reviews": []
     }
 ]

@@ -16,6 +16,7 @@ routes.get("/detail/:id", isAuthenticated, isAdmin, UserController.getOneById);
 routes.post("/create", isAuthenticated, isAdmin, UserController.create);
 routes.patch("/update/:id", isAuthenticated, isAdmin, UserController.updateById);
 routes.delete("/delete/:id", isAuthenticated, isAdmin, UserController.deleteById);
+routes.patch("/update-balance/:id", UserController.updateBalance);
 
 
 

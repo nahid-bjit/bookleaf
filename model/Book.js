@@ -1,22 +1,21 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose")
 
-// Define the review schema
-const reviewSchema = new mongoose.Schema({
-    user: String,
-    text: String,
-    rating: Number,
-});
-
-// Define the book schema
 const bookSchema = new mongoose.Schema({
     title: String,
     author: String,
     description: String,
     price: Number,
-    stock: Number
+    stock: Number,
+    discountedPrice: Number, // The price after applying the discount
+    discountPercentage: Number, // The discount percentage (e.g., 10%)
+    discountEndDate: Date, // The date when the discount ends
+    reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Review',
+        },
+    ],
 });
 
-// Create the Book model
 const Book = mongoose.model('Book', bookSchema);
-
 module.exports = Book;
