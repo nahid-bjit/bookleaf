@@ -1,3 +1,4 @@
+const { validationResult } = require("express-validator");
 const { sendResponse } = require("../util/common");
 const BookModel = require("../model/Book");
 //const Review = require('../model/Review');
@@ -7,7 +8,14 @@ class BookController {
 
     async getAll(req, res) {
         try {
-            let { page, limit, sortParam, sortOrder, search, author } = req.query;
+            const {
+                page = 1,
+                limit = 20,
+                sortParam,
+                sortOrder,
+                search,
+                author
+            } = req.query;
 
             // Pagination
             const parsedPage = parseInt(page) || 1;

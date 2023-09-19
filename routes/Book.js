@@ -1,11 +1,11 @@
 const express = require("express");
 const routes = express();
-const { userValidator, bookValidator } = require("../middleware/validation");
+const { userValidator, bookValidator, getAllValidator, validate } = require("../middleware/validation");
 const BookController = require("../controller/BookController");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 
-routes.get("/all", BookController.getAll);
+routes.get("/all", getAllValidator, validate, BookController.getAll);
 routes.get("/detail/:id", BookController.getOneById);
 //routes.post("/addBook", isAuthenticated, isAdmin, bookValidator.add, BookController.create);
 routes.post("/add", isAuthenticated, isAdmin, BookController.create);

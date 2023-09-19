@@ -9,29 +9,43 @@ const jsonwebtoken = require("jsonwebtoken");
 
 class AuthController {
     async login(req, res) {
-        const { email, password } = req.body;
-        const auth = await Auth.findOne({ email: email })
-            .populate("user", "-createdAt -updatedAt")
-            .select("-createdAt -updatedAt");
 
-        if (!auth) {
-            return sendResponse(res, HTTP_STATUS.OK, "User is not registered");
+        try {
+
+            const validation = validationResult(req).array();
+            if (validation.length > 0) {
+                return sendResponse(res, HTTP_STATUS.OK, "Failed to add the user", validation);
+            }
+
+            const { email, password } = req.body;
+            const auth = await Auth.findOne({ email: email })
+                .populate("user", "-createdAt -updatedAt")
+                .select("-createdAt -updatedAt");
+
+            if (!auth) {
+                return sendResponse(res, HTTP_STATUS.OK, "User is not registered");
+            }
+
+            const checkPassword = await bcrypt.compare(password, auth.password);
+
+            if (!checkPassword) {
+                return sendResponse(res, HTTP_STATUS.OK, "Invalid credentials");
+            }
+
+            const responseAuth = auth.toObject();
+            delete responseAuth.password;
+
+            const jwt = jsonwebtoken.sign(responseAuth, process.env.SECRET_KEY, { expiresIn: "24h" });
+
+            responseAuth.token = jwt;
+            return sendResponse(res, HTTP_STATUS.OK, "Successfully logged in", responseAuth);
+        } catch (error) {
+            console.log(error);
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
-
-        const checkPassword = await bcrypt.compare(password, auth.password);
-
-        if (!checkPassword) {
-            return sendResponse(res, HTTP_STATUS.OK, "Invalid credentials");
-        }
-
-        const responseAuth = auth.toObject();
-        delete responseAuth.password;
-
-        const jwt = jsonwebtoken.sign(responseAuth, process.env.SECRET_KEY, { expiresIn: "24h" });
-
-        responseAuth.token = jwt;
-        return sendResponse(res, HTTP_STATUS.OK, "Successfully logged in", responseAuth);
     }
+
+
 
     async signup(req, res) {
         try {

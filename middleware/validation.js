@@ -1,5 +1,30 @@
+const { validationResult } = require("express-validator");
 const { body, query, param } = require("express-validator");
 const { isValidObjectId } = require("mongoose");
+const { sendResponse } = require("../util/common")
+
+const getAllValidator = [
+    query('page')
+        .optional()
+        .isInt().withMessage('Page must be an integer')
+        .toInt(),
+    query('limit')
+        .optional()
+        .isInt().withMessage('Limit must be an integer')
+        .toInt(),
+    query('sortParam')
+        .optional()
+        .isIn(['price', 'stock']).withMessage('Invalid input parameter for sortParam'),
+    query('sortOrder')
+        .optional()
+        .isIn(['asc', 'desc']).withMessage('Invalid input parameter for sortOrder'),
+    query('search')
+        .optional()
+        .isString().withMessage('Search must be a string'),
+    query('author')
+        .optional()
+        .isString().withMessage('Author must be a string'),
+];
 
 const userValidator = {
     create: [
@@ -118,6 +143,34 @@ const cartValidator = {
 };
 
 const authValidator = {
+    login: [
+        body("email")
+            .exists()
+            .withMessage("Email must be provided")
+            .bail()
+            .isString()
+            .withMessage("Email must be a string")
+            .bail()
+            .isEmail()
+            .withMessage("Email must be in valid format"),
+        body("password")
+            .exists()
+            .withMessage("Password must be provided")
+            .bail()
+            .isString()
+            .withMessage("Password must be a string")
+            .bail()
+            .isStrongPassword({
+                minLength: 8,
+                minLowercase: 1,
+                minUppercase: 1,
+                minSymbols: 1,
+                minNumbers: 1,
+            })
+            .withMessage(
+                "Password must contain at least 8 characters with 1 lower case, 1 upper case, 1 number, 1 symbol"
+            ),
+    ],
     signup: [
         body("name")
             .exists()
@@ -200,6 +253,22 @@ const authValidator = {
     ],
 };
 
+const validate = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Create an array of error messages
+        const errorMessages = errors.array().map((error) => error.msg);
+
+        // Use the sendResponse method to send validation errors
+        return sendResponse(res, 400, 'Validation Error', errorMessages);
+    }
+    // Continue to the next middleware or route handler
+    next();
+};
+
+
+
+
 // module.exports = { userValidator, authValidator, bookValidator, cartValidator };
 
-module.exports = { userValidator, authValidator, bookValidator, cartValidator };
+module.exports = { validate, getAllValidator, userValidator, authValidator, bookValidator, cartValidator };

@@ -1,4 +1,5 @@
 // const mongoose = require('mongoose');
+const { sendResponse } = require("./util/common")
 const fs = require("fs");
 const path = require("path");
 const morgan = require("morgan");
@@ -38,7 +39,26 @@ app.use("/transactions", TransactionRouter);
 app.use("/reviews", ReviewRouter);
 
 
+// Define your routes and middleware above this catch-all route.
 
+// Custom error handling middleware
+app.use((err, req, res, next) => {
+    // Check if the error is a 404 (Not Found) error
+    if (err.status === 404) {
+        return sendResponse(res, 404, 'Not Found', 'The requested URL was not found on this server');
+    }
+
+    // Handle other errors with a 500 (Internal Server Error) status
+    sendResponse(res, 500, 'Internal Server Error', 'Something went wrong on the server');
+
+    // Log the error for debugging (optional)
+    console.error(err);
+});
+
+// Catch-all route handler for undefined routes
+app.all('*', (req, res) => {
+    sendResponse(res, 404, 'Not Found', 'The requested URL was not found on this server');
+});
 
 databaseConnection(() => {
     app.listen(8000, () => {
@@ -46,3 +66,4 @@ databaseConnection(() => {
         console.log("Server is running on port 8000");
     });
 })
+
