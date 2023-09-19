@@ -67,7 +67,9 @@ class TransactionController {
 
     async create(req, res) {
         try {
-            const { userId, cartId } = req.body;
+            // Retrieve the user's ID from the JWT token
+            const userId = req.user;
+            const { cartId } = req.body;
 
             // Retrieve the user's cart
             const cart = await CartModel.findOne({ _id: cartId, user: userId });
@@ -77,7 +79,7 @@ class TransactionController {
             }
 
             if (cart.books.length === 0) {
-                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Please add books to cart first");
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Please add books to the cart first");
             }
 
             // Calculate the total transaction amount
@@ -105,6 +107,15 @@ class TransactionController {
                     total: totalTransactionAmount,
                 });
 
+                // Reduce the book stock for each book in the cart
+                for (const cartItem of cart.books) {
+                    const book = await BookModel.findById(cartItem.book);
+                    if (book) {
+                        book.stock -= cartItem.quantity;
+                        await book.save();
+                    }
+                }
+
                 // Reset the user's cart
                 cart.books = [];
                 cart.total = 0;
@@ -119,6 +130,8 @@ class TransactionController {
             return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
+
+
 
 
     // ## previous working code without the balance thing ##

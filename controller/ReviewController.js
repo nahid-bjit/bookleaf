@@ -1,6 +1,8 @@
 const Review = require('../model/Review');
 const { sendResponse } = require("../util/common");
 const Book = require("../model/Book");
+const { validationResult } = require("express-validator");
+
 
 
 // Define the sendResponse function
@@ -8,17 +10,33 @@ const Book = require("../model/Book");
 class ReviewController {
     static async createReview(req, res) {
         try {
-            const { userId, rating, review } = req.body;
+            const validationErrors = validationResult(req);
+
+            if (!validationErrors.isEmpty()) {
+                // Use the validationErrors to send a response
+                return sendResponse(res, 400, "Validation failed", validationErrors.array());
+            }
+
+            const { rating, review } = req.body;
             const { bookId } = req.params;
 
+            console.log("request body: ", req)
+
+            // Retrieve the userId from req.user (assuming it's available in the JWT payload)
+
+            const userId = req.user;
+
+            console.log("userId: ", userId)
+
             // Check if a review with the same userId and bookId exists
-            const existingReview = await Review.findOne({ userId, bookId });
+            const existingReview = await Review.findOne({ bookId });
 
             if (existingReview) {
                 // If a review already exists for this user and product, send an error response
                 return sendResponse(res, 400, 'You have already reviewed this product');
             }
 
+            // Set userId explicitly when creating the review
             const ReviewModel = new Review({ bookId, userId, rating, review });
             await ReviewModel.save();
 
@@ -36,36 +54,51 @@ class ReviewController {
 
     static async editReview(req, res) {
         try {
-            const { userId, rating, review } = req.body;
-            const { bookId, reviewId } = req.params;
-
-            // console.log("req.body: ", req.body);
-            //  console.log("req.params: ", req.params);
-
-            // Validate the rating and review as needed
+            const { rating, review } = req.body;
+            const { reviewId } = req.params;
 
             // Find the review to update
             const existingReview = await Review.findOne({ _id: reviewId });
 
             if (!existingReview) {
                 // Use sendResponse to send an error response
-                sendResponse(res, 404, 'Review not found');
-                return;
+                return sendResponse(res, 404, 'Review not found');
             }
 
-            // Update the review
-            existingReview.rating = rating;
-            existingReview.review = review;
+            // Ensure that the user ID in the JWT matches the user ID associated with the review
+            if (existingReview.userId.toString() !== req.user) {
+                // Use sendResponse to send an error response
+                return sendResponse(res, 403, 'You do not have permission to edit this review');
+            }
+
+            // Update the review if the fields are provided
+            if (rating !== undefined) {
+                existingReview.rating = rating;
+            }
+
+            if (review !== undefined) {
+                existingReview.review = review;
+            }
+
+            // Validate the updated review
+            const validationErrors = existingReview.validateSync();
+            if (validationErrors) {
+                const errorMessages = Object.values(validationErrors.errors).map(err => err.message);
+                return sendResponse(res, 400, 'Validation failed', errorMessages);
+            }
+
+            // Save the updated review
             await existingReview.save();
 
             // Use sendResponse to send a success response
             sendResponse(res, 200, 'Review updated successfully');
         } catch (error) {
             console.error(error);
-            // Use sendResponse to send an error response
             sendResponse(res, 500, 'Internal server error');
         }
     }
+
+
 
     static async deleteReview(req, res) {
         try {

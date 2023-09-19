@@ -74,65 +74,95 @@ const userValidator = {
 
 const bookValidator = {
     add: [
-        body("title")
+        body('title')
             .exists()
-            .withMessage("book title must be provided")
-            .bail()
+            .withMessage('Book title must be provided')
             .isString()
-            .withMessage("book title must be a string")
-            .bail()
+            .withMessage('Book title must be a string')
             .isLength({ min: 10 })
-            .withMessage("book title must be at least 10 characters long"),
-        body("description")
+            .withMessage('Book title must be at least 10 characters long'),
+
+        body('author')
             .exists()
-            .withMessage("book description must be provided")
-            .bail()
+            .withMessage('Author must be provided')
             .isString()
-            .withMessage("book description must be a string")
-            .bail()
+            .withMessage('Author must be a string')
+            .isLength({ min: 5 })
+            .withMessage('Author name must be at least 5 characters long'),
+
+        body('description')
+            .exists()
+            .withMessage('Book description must be provided')
+            .isString()
+            .withMessage('Book description must be a string')
             .isLength({ min: 30 })
-            .withMessage("book description must be at least 30 characters long"),
-        body("price")
+            .withMessage('Book description must be at least 30 characters long'),
+
+        body('price')
             .exists()
-            .withMessage("book price must be provided")
-            .bail()
+            .withMessage('Book price must be provided')
             .isNumeric()
-            .withMessage("book price must be a number")
-            .bail()
+            .withMessage('Book price must be a number')
             .isFloat({ min: 1 })
-            .withMessage("book price must be greater than 0"),
-        body("stock")
+            .withMessage('Book price must be greater than 0'),
+
+        body('stock')
             .exists()
-            .withMessage("book stock must be provided")
-            .bail()
+            .withMessage('Book stock must be provided')
             .isNumeric()
-            .withMessage("book stock must be a number")
-            .bail()
+            .withMessage('Book stock must be a number')
             .isInt({ min: 1 })
-            .withMessage("book stock must be greater than 0"),
-        body("brand")
-            .exists()
-            .withMessage("book stock must be provided")
-            .bail()
+            .withMessage('Book stock must be greater than 0'),
+    ],
+
+    edit: [
+        body('title')
+            .optional()
             .isString()
-            .withMessage("book brand must be a string"),
+            .withMessage('Book title must be a string')
+            .isLength({ min: 10 })
+            .withMessage('Book title must be at least 10 characters long'),
+        body("author")
+            .optional()
+            .isString()
+            .withMessage("Author must be a string")
+            .bail()
+            .isLength({ min: 5 })
+            .withMessage("Author name must be at least 5 characters long"),
+
+
+        body('description')
+            .optional()
+            .isString()
+            .withMessage('Book description must be a string')
+            .isLength({ min: 30 })
+            .withMessage('Book description must be at least 30 characters long'),
+
+        body('price')
+            .optional()
+            .isNumeric()
+            .withMessage('Book price must be a number')
+            .isFloat({ min: 1 })
+            .withMessage('Book price must be greater than 0'),
+
+        body('stock')
+            .optional()
+            .isNumeric()
+            .withMessage('Book stock must be a number')
+            .isInt({ min: 1 })
+            .withMessage('Book stock must be greater than 0'),
     ],
 };
 
 const cartValidator = {
     addRemoveItemCart: [
-        body("userId")
-            .exists()
-            .withMessage("User ID must be provided")
-            .bail()
-            .matches(/^[a-f\d]{24}$/i)
-            .withMessage("ID is not in valid mongoDB format"),
         body("bookId")
             .exists()
             .withMessage("Book ID must be provided")
             .bail()
             .matches(/^[a-f\d]{24}$/i)
             .withMessage("ID is not in valid mongoDB format"),
+
         body("amount")
             .exists()
             .withMessage("Book quantity must be provided")
@@ -253,6 +283,50 @@ const authValidator = {
     ],
 };
 
+const reviewValidator = {
+    addReview: [
+        body("userId")
+            .optional()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("User ID is not in valid MongoDB format"),
+
+        body("rating")
+            .exists()
+            .withMessage("Rating must be provided")
+            .bail()
+            .isFloat({ min: 1, max: 5 }) // Assuming ratings are between 1 and 5
+            .withMessage("Rating must be a number between 1 and 5"),
+
+        body("review")
+            .optional()
+            .isString()
+            .withMessage("Review must be a string")
+            .isLength({ max: 255 }) // Adjust the max length as needed
+            .withMessage("Review cannot exceed 255 characters"),
+    ],
+    editReview: [
+        body("rating")
+            .optional()
+            .isFloat({ min: 1, max: 5 }) // Assuming ratings are between 1 and 5
+            .withMessage("Rating must be a number between 1 and 5"),
+
+        body("review")
+            .optional()
+            .isString()
+            .withMessage("Review must be a string")
+            .isLength({ max: 255 }) // Adjust the max length as needed
+            .withMessage("Review cannot exceed 255 characters"),
+
+        param("reviewId")
+            .exists()
+            .withMessage("Review ID must be provided")
+            .bail()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("Review ID is not in valid MongoDB format"),
+    ],
+
+};
+
 const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -271,4 +345,4 @@ const validate = (req, res, next) => {
 
 // module.exports = { userValidator, authValidator, bookValidator, cartValidator };
 
-module.exports = { validate, getAllValidator, userValidator, authValidator, bookValidator, cartValidator };
+module.exports = { validate, getAllValidator, userValidator, authValidator, bookValidator, cartValidator, reviewValidator };

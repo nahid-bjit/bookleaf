@@ -8,16 +8,19 @@ const isAuthenticated = (req, res, next) => {
             return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Unauthorized access");
         }
         const jwt = req.headers.authorization.split(" ")[1];
+        //console.log("jwt: ", jwt)
         const validate = jsonwebtoken.verify(jwt, process.env.SECRET_KEY);
+        // console.log("userId from jwt: ", validate)
 
         if (validate) {
+            // console.log("userId: ", req.user)
             req.user = validate.user;
             next();
         } else {
             throw new Error();
         }
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         if (error instanceof jsonwebtoken.JsonWebTokenError) {
             return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Token invalid");
         }
@@ -43,4 +46,19 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-module.exports = { isAuthenticated, isAdmin };
+const isUser = (req, res, next) => {
+    try {
+        const jwt = req.headers.authorization.split(" ")[1];
+        const validate = jsonwebtoken.decode(jwt);
+        if (validate.role === 2) {
+            next();
+        } else {
+            return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Unauthorized access");
+        }
+    } catch (error) {
+        console.log(error);
+        return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Something went wrong");
+    }
+};
+
+module.exports = { isAuthenticated, isAdmin, isUser };

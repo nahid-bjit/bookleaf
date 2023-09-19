@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 const HTTP_STATUS = require("../constants/statusCodes");
 const CartModel = require("../model/Cart");
@@ -31,16 +32,19 @@ class CartController {
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the book", validation);
             }
 
-            const { userId, bookId, amount } = req.body;
+            // Retrieve the user ID from the JWT token
+            const userId = req.user;
 
-            const user = await UserModel.findById({ _id: userId });
+            const user = await UserModel.findById(userId);
 
             if (!user) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "User does not exist");
             }
 
+            const { bookId, amount } = req.body;
+
             const cart = await CartModel.findOne({ user: userId });
-            const book = await BookModel.findById({ _id: bookId });
+            const book = await BookModel.findById(bookId);
 
             if (!book) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with ID was not found");
@@ -85,10 +89,18 @@ class CartController {
             await cart.save();
             return sendResponse(res, HTTP_STATUS.CREATED, "Added item to existing cart", cart);
         } catch (error) {
-            console.log(error);
-            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
+            // Handle the specific error
+            if (error instanceof mongoose.Error.CastError) {
+                // Handle the invalid ObjectId error
+                return sendResponse(res, HTTP_STATUS.BAD_REQUEST, 'Invalid bookId', 'BookId must be a valid ObjectId');
+            } else {
+                // Handle other errors
+                console.error(error); // Log the error for debugging
+                return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, 'Internal server error');
+            }
         }
     }
+
 
     // ## working code without the discount avail part ##
     // async addBookToCart(req, res) {
@@ -155,13 +167,16 @@ class CartController {
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to remove the book", validation);
             }
 
-            const { userId, bookId, amount } = req.body;
+            // Retrieve the user ID from the JWT token
+            const userId = req.user;
 
-            const user = await UserModel.findById({ _id: userId });
+            const user = await UserModel.findById(userId);
 
             if (!user) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "User does not exist");
             }
+
+            const { bookId, amount } = req.body;
 
             const cart = await CartModel.findOne({ user: userId });
 
@@ -169,18 +184,19 @@ class CartController {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Cart was not found for this user");
             }
 
-            const book = await BookModel.findById({ _id: bookId });
+            const book = await BookModel.findById(bookId);
 
             if (!book) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with ID was not found");
             }
 
-            const bookExistIntex = cart.books.findIndex((element) => String(element.book) === bookId);
-            if (bookExistIntex === -1) {
+            const bookExistIndex = cart.books.findIndex((element) => String(element.book) === bookId);
+
+            if (bookExistIndex === -1) {
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Book was not found in cart");
             }
 
-            if (cart.books[bookExistIntex].quantity < amount) {
+            if (cart.books[bookExistIndex].quantity < amount) {
                 return sendResponse(
                     res,
                     HTTP_STATUS.UNPROCESSABLE_ENTITY,
@@ -188,24 +204,25 @@ class CartController {
                 );
             }
 
-            if (cart.books[bookExistIntex].quantity === amount) {
-                cart.books.splice(bookExistIntex, 1);
+            if (cart.books[bookExistIndex].quantity === amount) {
+                cart.books.splice(bookExistIndex, 1);
                 cart.total = cart.total - amount * book.price;
                 await cart.save();
-                return sendResponse(res, HTTP_STATUS.OK, "book removed from cart", cart);
+                return sendResponse(res, HTTP_STATUS.OK, "Book removed from cart", cart);
             }
 
-            if (cart.books[bookExistIntex].quantity > amount) {
-                cart.books[bookExistIntex].quantity -= amount;
+            if (cart.books[bookExistIndex].quantity > amount) {
+                cart.books[bookExistIndex].quantity -= amount;
                 cart.total = cart.total - amount * book.price;
                 await cart.save();
-                return sendResponse(res, HTTP_STATUS.OK, "book reduced in cart", cart);
+                return sendResponse(res, HTTP_STATUS.OK, "Book reduced in cart", cart);
             }
         } catch (error) {
             console.log(error);
             return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
+
 }
 
 module.exports = new CartController();

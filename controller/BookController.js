@@ -121,18 +121,18 @@ class BookController {
 
     async create(req, res) {
         try {
-            // const validation = validationResult(req).array();
-            // if (validation.length > 0) {
-            //     // Use sendResponse to send an error response
-            //     return sendResponse(res, HTTP_STATUS.OK, "Failed to add the product", validation);
-            // }
+            const validation = validationResult(req).array();
+            if (validation.length > 0) {
+                // Use sendResponse to send an error response with BAD_REQUEST status code
+                return sendResponse(res, HTTP_STATUS.BAD_REQUEST, "Failed to add the product", validation);
+            }
             const { title, description, price, stock, author } = req.body;
 
             const existingProduct = await BookModel.findOne({ title: title });
 
             if (existingProduct) {
-                // Use sendResponse to send an error response
-                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with same title already exists");
+                // Use sendResponse to send an error response with NOT_FOUND status code
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with the same title already exists");
             }
 
             const newBook = await BookModel.create({
@@ -149,10 +149,11 @@ class BookController {
             }
         } catch (error) {
             console.log(error);
-            // Use sendResponse to send an error response
+            // Use sendResponse to send an error response with INTERNAL_SERVER_ERROR status code
             return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
+
 
     async deleteById(req, res) {
         try {
@@ -210,6 +211,13 @@ class BookController {
                 return sendResponse(res, 404, 'No books found with the provided IDs');
             }
 
+            // Check if any of the selected books already have a discount
+            const booksWithDiscount = books.filter(book => book.discountPercentage > 0 || book.discountedPrice > 0);
+
+            if (booksWithDiscount.length > 0) {
+                return sendResponse(res, 400, 'Some of the selected books already have a discount applied');
+            }
+
             // Update the discount information for each book
             books.forEach(async (book) => {
                 book.discountedPrice = discountedPrice;
@@ -226,6 +234,7 @@ class BookController {
             return sendResponse(res, 500, 'Internal server error');
         }
     }
+
 
     async updateDiscount(req, res) {
         try {
