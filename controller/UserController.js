@@ -1,5 +1,6 @@
 const { sendResponse } = require("../util/common");
 const UserModel = require("../model/User");
+const AuthModel = require("../model/Auth");
 const HTTP_STATUS = require("../constants/statusCodes");
 const { validationResult } = require("express-validator");
 
@@ -99,10 +100,20 @@ class UserController {
                 return; // Return early to avoid further processing
             }
 
-            // Attempt to update the document
-            const result = await UserModel.updateOne({ _id: id }, { $set: updatedData });
-            sendResponse(res, HTTP_STATUS.OK, "Successfully updated the product");
+            // Attempt to update the document and retrieve the updated object
+            const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, { $set: updatedData }, { new: true });
 
+            if (updatedUser) {
+                // Include the updated user object in the response JSON
+                const response = {
+                    message: "Successfully updated the product",
+                    updatedUser // Include the updated user object here
+                };
+
+                sendResponse(res, HTTP_STATUS.OK, response);
+            } else {
+                sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Failed to update the product");
+            }
         } catch (error) {
             console.log("error: ", error);
             // Use sendResponse to send an error response
@@ -110,23 +121,38 @@ class UserController {
         }
     }
 
+
     async deleteById(req, res) {
         try {
             const { id } = req.params;
-            const result = await UserModel.deleteOne({ _id: id });
 
-            if (result.deletedCount > 0) {
+            // Check if the user exists before deleting
+            const existingUser = await UserModel.findOne({ _id: id });
+
+            if (!existingUser) {
+                // Use sendResponse to send an error response
+                return sendResponse(res, 400, "User not found");
+            }
+
+            // Attempt to delete the user
+            const userDeleteResult = await UserModel.deleteOne({ _id: id });
+
+            if (userDeleteResult.deletedCount > 0) {
+                // Check and delete the corresponding entry in the 'auth' collection
+                await AuthModel.deleteOne({ userId: id });
+
                 // Use sendResponse to send a success response
-                sendResponse(res, 200, "Successfully deleted the product");
+                return sendResponse(res, 200, "User and associated data successfully deleted");
             } else {
                 // Use sendResponse to send an error response
-                sendResponse(res, 400, "Data not found");
+                return sendResponse(res, 400, "User data not found");
             }
         } catch (error) {
             // Use sendResponse to send an error response
-            sendResponse(res, 500, "Internal server error");
+            return sendResponse(res, 500, "Internal server error");
         }
     }
+
 
     async updateBalance(req, res) {
         try {
@@ -140,7 +166,7 @@ class UserController {
             const user = await UserModel.findOne({ _id: userId });
 
             if (!user) {
-                return res.status(404).json({ message: 'User not found' });
+                return sendResponse(res, 404, 'User not found');
             }
 
             // Update the user's balance
@@ -149,13 +175,20 @@ class UserController {
             // Save the updated user
             await user.save();
 
+            // Include newBalance in the response JSON
+            const response = {
+                message: 'Balance updated successfully',
+                newBalance: user.balance // Include newBalance in the response
+            };
 
-            return res.status(200).json({ message: 'Balance updated successfully' });
+            return sendResponse(res, 200, response);
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            return sendResponse(res, 500, 'Internal server error');
         }
     }
+
+
 
 }
 

@@ -5,17 +5,12 @@ const UserController = require("../controller/UserController");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 
-
-
-
-
-
 routes.get("/all", isAuthenticated, isAdmin, UserController.getAll);
 routes.get("/detail/:id", isAuthenticated, isAdmin, UserController.getOneById);
 routes.post("/create", isAuthenticated, isAdmin, userValidator.create, UserController.create);
 routes.patch("/update/:id", isAuthenticated, isAdmin, UserController.updateById);
 routes.delete("/delete/:id", isAuthenticated, isAdmin, UserController.deleteById);
-routes.patch("/update-balance/:id", UserController.updateBalance);
+routes.patch("/update-balance/:id", isAuthenticated, UserController.updateBalance);
 
 
 

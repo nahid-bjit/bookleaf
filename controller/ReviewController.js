@@ -44,7 +44,7 @@ class ReviewController {
             bookForReview.reviews.push(ReviewModel._id);
             await bookForReview.save();
 
-            sendResponse(res, 201, 'Review created successfully');
+            sendResponse(res, 201, 'Review created successfully', bookForReview);
         } catch (error) {
             console.error("error", error);
             sendResponse(res, 500, 'Internal server error');

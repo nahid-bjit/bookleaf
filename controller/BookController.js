@@ -187,16 +187,27 @@ class BookController {
                 return; // Return early to avoid further processing
             }
 
-            // Attempt to update the document
-            const result = await BookModel.updateOne({ _id: id }, { $set: updatedData });
-            sendResponse(res, HTTP_STATUS.OK, "Successfully updated the product");
+            // Attempt to update the document and retrieve the updated object
+            const updatedBook = await BookModel.findOneAndUpdate({ _id: id }, { $set: updatedData }, { new: true });
 
+            if (updatedBook) {
+                // Include the updated book object in the response JSON
+                const response = {
+                    message: "Successfully updated the product",
+                    updatedBook // Include the updated book object here
+                };
+
+                sendResponse(res, HTTP_STATUS.OK, response);
+            } else {
+                sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Failed to update the product");
+            }
         } catch (error) {
             console.log("error: ", error);
             // Use sendResponse to send an error response
             sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
+
 
     // Controller to give a discount to one or multiple books
     async giveDiscount(req, res) {
@@ -215,7 +226,12 @@ class BookController {
             const booksWithDiscount = books.filter(book => book.discountPercentage > 0 || book.discountedPrice > 0);
 
             if (booksWithDiscount.length > 0) {
-                return sendResponse(res, 400, 'Some of the selected books already have a discount applied');
+                // Include the books with discounts in the response
+                const response = {
+                    message: 'Some of the selected books already have a discount applied',
+                    discountedBooks: booksWithDiscount
+                };
+                return sendResponse(res, 400, response);
             }
 
             // Update the discount information for each book
@@ -236,6 +252,7 @@ class BookController {
     }
 
 
+
     async updateDiscount(req, res) {
         try {
             const { bookIds } = req.body;
@@ -249,21 +266,30 @@ class BookController {
             }
 
             // Update the discount information for each book
-            books.forEach(async (book) => {
+            const updatedBooks = [];
+
+            for (const book of books) {
                 book.discountedPrice = discountedPrice;
                 book.discountPercentage = discountPercentage;
                 book.discountEndDate = discountEndDate;
 
-                // Save the updated book
-                await book.save();
-            });
+                // Save the updated book and add it to the updatedBooks array
+                const updatedBook = await book.save();
+                updatedBooks.push(updatedBook);
+            }
 
-            return sendResponse(res, 200, 'Discount applied successfully to selected books');
+            const response = {
+                message: 'Discount applied successfully to selected books',
+                updatedBooks
+            };
+
+            return sendResponse(res, 200, response);
         } catch (error) {
             console.error(error);
             return sendResponse(res, 500, 'Internal server error');
         }
-    };
+    }
+
 
 
 
