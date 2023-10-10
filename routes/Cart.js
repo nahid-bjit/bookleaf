@@ -1,12 +1,12 @@
 const express = require("express");
 const routes = express();
 const { userValidator, productValidator, cartValidator } = require("../middleware/validation");
-const { isAuthenticated, isAdmin } = require("../middleware/auth");
+const { isAuthenticated, isAdmin, isUser } = require("../middleware/auth");
 const CartController = require("../controller/CartController");
 
 routes.get("/:userId", isAuthenticated, CartController.getCart);
 routes.post("/add-product",
-    isAuthenticated,
+    isAuthenticated, isUser,
     cartValidator.addRemoveItemCart,
     CartController.addBookToCart
 );

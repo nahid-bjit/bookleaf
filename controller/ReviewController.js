@@ -8,6 +8,7 @@ const { validationResult } = require("express-validator");
 // Define the sendResponse function
 
 class ReviewController {
+
     static async createReview(req, res) {
         try {
             const validationErrors = validationResult(req);
@@ -20,16 +21,11 @@ class ReviewController {
             const { rating, review } = req.body;
             const { bookId } = req.params;
 
-            console.log("request body: ", req)
-
             // Retrieve the userId from req.user (assuming it's available in the JWT payload)
-
             const userId = req.user;
 
-            console.log("userId: ", userId)
-
             // Check if a review with the same userId and bookId exists
-            const existingReview = await Review.findOne({ bookId });
+            const existingReview = await Review.findOne({ bookId, userId });
 
             if (existingReview) {
                 // If a review already exists for this user and product, send an error response
@@ -41,7 +37,23 @@ class ReviewController {
             await ReviewModel.save();
 
             const bookForReview = await Book.findOne({ _id: bookId });
+
+            // Add the new review to the book's reviews
             bookForReview.reviews.push(ReviewModel._id);
+
+            // Calculate the average rating for the book
+            let totalRatings = 0;
+
+            for (const reviewId of bookForReview.reviews) {
+                const review = await Review.findOne({ _id: reviewId });
+                totalRatings += review.rating;
+            }
+
+            const averageRating = totalRatings / bookForReview.reviews.length;
+
+            // Update the book's average rating
+            bookForReview.averageRating = averageRating;
+
             await bookForReview.save();
 
             sendResponse(res, 201, 'Review created successfully', bookForReview);
@@ -97,7 +109,6 @@ class ReviewController {
             sendResponse(res, 500, 'Internal server error');
         }
     }
-
 
 
     static async deleteReview(req, res) {

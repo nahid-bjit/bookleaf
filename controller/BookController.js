@@ -10,7 +10,7 @@ class BookController {
         try {
             const {
                 page = 1,
-                limit = 20,
+                limit,
                 sortParam,
                 sortOrder,
                 search,
@@ -59,8 +59,8 @@ class BookController {
 
             // The combined query
             const books = await BookModel.find(query)
-                .skip(skipCount)
-                .limit(adjustedLimit)
+                // .skip(skipCount)
+                // .limit(adjustedLimit)
                 .sort(sortObj)
                 .populate('reviews'); // Populate the 'reviews' field
 
@@ -103,10 +103,24 @@ class BookController {
         try {
             const { id } = req.params;
             const book = await BookModel.findOne({ _id: id })
-                .populate('reviews'); // Populate the 'reviews' field
+                .populate('reviews')
+                .select('-reviews._id'); // Exclude review IDs
 
             if (book) {
-                // Use sendResponse to send a success response
+                // Calculate the average rating
+                let totalRatings = 0;
+                if (book.reviews && book.reviews.length > 0) {
+                    for (const review of book.reviews) {
+                        totalRatings += review.rating;
+                    }
+                    book.averageRating = totalRatings / book.reviews.length;
+                    await book.save();
+                } else {
+                    // If there are no reviews, set the average rating to 0 or any default value.
+                    book.averageRating = 0;
+                }
+
+                // Use sendResponse to send a success response with the book including average rating
                 sendResponse(res, HTTP_STATUS.OK, "Successfully received the book", book);
             } else {
                 // Use sendResponse to send an error response
@@ -118,6 +132,7 @@ class BookController {
             sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error", null);
         }
     }
+
 
     async create(req, res) {
         try {

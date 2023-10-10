@@ -5,7 +5,8 @@
         "description": "A coming-of-age novel featuring Holden Caulfield.",
         "price": 12.99,
         "stock": 50,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "To Kill a Mockingbird",
@@ -13,7 +14,8 @@
         "description": "A classic novel set in the American South during the 1930s.",
         "price": 9.99,
         "stock": 40,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "1984",
@@ -21,7 +23,8 @@
         "description": "A dystopian novel set in a totalitarian society.",
         "price": 14.49,
         "stock": 30,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "Pride and Prejudice",
@@ -29,7 +32,8 @@
         "description": "A classic romantic novel set in 19th-century England.",
         "price": 11.99,
         "stock": 45,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "The Great Gatsby",
@@ -37,7 +41,8 @@
         "description": "A novel exploring the American Dream during the Jazz Age.",
         "price": 10.99,
         "stock": 35,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "Harry Potter and the Sorcerer's Stone",
@@ -45,7 +50,8 @@
         "description": "The first book in the popular Harry Potter series.",
         "price": 16.99,
         "stock": 55,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "Brave New World",
@@ -53,7 +59,8 @@
         "description": "A dystopian novel exploring a futuristic society.",
         "price": 13.99,
         "stock": 25,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "The Hobbit",
@@ -61,7 +68,8 @@
         "description": "A fantasy adventure novel featuring Bilbo Baggins.",
         "price": 15.99,
         "stock": 20,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     },
     {
         "title": "The Da Vinci Code",
@@ -69,6 +77,7 @@
         "description": "A thriller novel featuring Robert Langdon.",
         "price": 14.99,
         "stock": 30,
-        "reviews": []
+        "reviews": [],
+        "rating": 5
     }
 ]

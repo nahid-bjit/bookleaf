@@ -14,7 +14,7 @@ class AuthController {
 
             const validation = validationResult(req).array();
             if (validation.length > 0) {
-                return sendResponse(res, HTTP_STATUS.OK, "Failed to add the user", validation);
+                return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Failed to add the user", validation);
             }
 
             const { email, password } = req.body;
@@ -23,13 +23,13 @@ class AuthController {
                 .select("-createdAt -updatedAt");
 
             if (!auth) {
-                return sendResponse(res, HTTP_STATUS.OK, "User is not registered");
+                return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "User is not registered");
             }
 
             const checkPassword = await bcrypt.compare(password, auth.password);
 
             if (!checkPassword) {
-                return sendResponse(res, HTTP_STATUS.OK, "Invalid credentials");
+                return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Invalid credentials");
             }
 
             const responseAuth = auth.toObject();
@@ -40,7 +40,7 @@ class AuthController {
             responseAuth.token = jwt;
             return sendResponse(res, HTTP_STATUS.OK, "Successfully logged in", responseAuth);
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
