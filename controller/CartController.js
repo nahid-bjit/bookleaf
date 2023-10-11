@@ -27,8 +27,10 @@ class CartController {
 
     async addBookToCart(req, res) {
         try {
+            console.log("meow 1")
             const validation = validationResult(req).array();
             if (validation.length > 0) {
+                console.log("meow 2")
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the book", validation);
             }
 
@@ -38,6 +40,7 @@ class CartController {
             const user = await UserModel.findById(userId);
 
             if (!user) {
+                console.log("meow 3")
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "User does not exist");
             }
 

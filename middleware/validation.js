@@ -183,23 +183,23 @@ const authValidator = {
             .bail()
             .isEmail()
             .withMessage("Email must be in valid format"),
-        body("password")
-            .exists()
-            .withMessage("Password must be provided")
-            .bail()
-            .isString()
-            .withMessage("Password must be a string")
-            .bail()
-            .isStrongPassword({
-                minLength: 8,
-                minLowercase: 1,
-                minUppercase: 1,
-                minSymbols: 1,
-                minNumbers: 1,
-            })
-            .withMessage(
-                "Password must contain at least 8 characters with 1 lower case, 1 upper case, 1 number, 1 symbol"
-            ),
+        // body("password")
+        //     .exists()
+        //     .withMessage("Password must be provided")
+        //     .bail()
+        //     .isString()
+        //     .withMessage("Password must be a string")
+        //     .bail()
+        //     .isStrongPassword({
+        //         minLength: 8,
+        //         minLowercase: 1,
+        //         minUppercase: 1,
+        //         minSymbols: 1,
+        //         minNumbers: 1,
+        //     })
+        //     .withMessage(
+        //         "Password must contain at least 8 characters with 1 lower case, 1 upper case, 1 number, 1 symbol"
+        //     ),
     ],
     signup: [
         body("name")

@@ -48,6 +48,7 @@ const isAdmin = (req, res, next) => {
 
 const isUser = (req, res, next) => {
     try {
+        console.log("headers: ", req.headers.authorization)
         const jwt = req.headers.authorization.split(" ")[1];
         const validate = jsonwebtoken.decode(jwt);
         if (validate.role === 2) {

@@ -6,8 +6,9 @@ const CartController = require("../controller/CartController");
 
 routes.get("/:userId", isAuthenticated, CartController.getCart);
 routes.post("/add-product",
-    isAuthenticated, isUser,
-    cartValidator.addRemoveItemCart,
+    // isAuthenticated,
+    isUser,
+    //cartValidator.addRemoveItemCart,
     CartController.addBookToCart
 );
 routes.patch(

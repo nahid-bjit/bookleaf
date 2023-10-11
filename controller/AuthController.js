@@ -9,26 +9,35 @@ const jsonwebtoken = require("jsonwebtoken");
 
 class AuthController {
     async login(req, res) {
+        console.log("req: ", req)
 
         try {
 
             const validation = validationResult(req).array();
+            console.log("validation: ", validation)
             if (validation.length > 0) {
+                console.log("meow 2")
                 return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Failed to add the user", validation);
             }
+
+            console.log("req body: ", req.body)
 
             const { email, password } = req.body;
             const auth = await Auth.findOne({ email: email })
                 .populate("user", "-createdAt -updatedAt")
                 .select("-createdAt -updatedAt");
 
+            console.log("auth: ", auth)
+
             if (!auth) {
+                console.log("meow 3")
                 return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "User is not registered");
             }
 
             const checkPassword = await bcrypt.compare(password, auth.password);
 
             if (!checkPassword) {
+                console.log("meow 4")
                 return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Invalid credentials");
             }
 

@@ -8,7 +8,11 @@ const { authValidator } = require("../middleware/validation");
 // routes.get("/detail/:id", UserController.getOneById);
 // routes.post("/create", userValidator.create, UserController.create);
 
-routes.post("/login", authValidator.login, AuthController.login);
-routes.post("/sign-up", authValidator.signup, AuthController.signup);
+routes.post("/login",
+    authValidator.login,
+    AuthController.login);
+routes.post("/sign-up",
+    //authValidator.signup, 
+    AuthController.signup);
 
 module.exports = routes;
