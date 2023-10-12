@@ -5,6 +5,7 @@ const CartModel = require("../model/Cart");
 const BookModel = require("../model/Book");
 const UserModel = require("../model/User");
 const { sendResponse } = require("../util/common");
+const Cart = require("../model/Cart");
 
 class CartController {
     async getCart(req, res) {
@@ -36,8 +37,10 @@ class CartController {
 
             // Retrieve the user ID from the JWT token
             const userId = req.user;
+            console.log("user Id: ", userId)
 
             const user = await UserModel.findById(userId);
+            console.log("user id: ", user)
 
             if (!user) {
                 console.log("meow 3")
@@ -46,14 +49,19 @@ class CartController {
 
             const { bookId, amount } = req.body;
 
+            console.log("request body: ", bookId, amount)
+
             const cart = await CartModel.findOne({ user: userId });
+            console.log("cart", cart)
             const book = await BookModel.findById(bookId);
 
             if (!book) {
+                console.log("Book with ID was not found")
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Book with ID was not found");
             }
 
             if (book.stock < amount) {
+                console.log("Not enough books are in stock")
                 return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Not enough books are in stock");
             }
 
@@ -74,6 +82,7 @@ class CartController {
                 });
 
                 if (newCart) {
+                    console.log("item added")
                     return sendResponse(res, HTTP_STATUS.OK, "Added item to existing cart", newCart);
                 }
             }
@@ -81,6 +90,7 @@ class CartController {
             const bookIndex = cart.books.findIndex((element) => String(element.book) === bookId);
             if (bookIndex !== -1) {
                 if (book.stock < cart.books[bookIndex].quantity + amount) {
+                    console.log("Not enough books")
                     return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Not enough books are in stock");
                 }
                 cart.books[bookIndex].quantity += amount;

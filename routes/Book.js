@@ -5,7 +5,10 @@ const BookController = require("../controller/BookController");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 
-routes.get("/all", getAllValidator, validate, BookController.getAll);
+routes.get("/all",
+    //getAllValidator, 
+    //validate, 
+    BookController.getAll);
 routes.get("/detail/:id", BookController.getOneById);
 //routes.post("/addBook", isAuthenticated, isAdmin, bookValidator.add, BookController.create);
 //routes.post("/add", isAuthenticated, isAdmin, bookValidator.add, BookController.create);
