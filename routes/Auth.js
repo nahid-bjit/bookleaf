@@ -15,4 +15,11 @@ routes.post("/sign-up",
     //authValidator.signup, 
     AuthController.signup);
 
+routes.post("/forget-password", AuthController.sendForgotPasswordEmail);
+routes.post("/check-token", AuthController.validatePasswordResetRequest);
+routes.post("/reset-password", AuthController.resetPassword);
+
+
+
+
 module.exports = routes;

@@ -13,17 +13,36 @@ const authSchema = new mongoose.Schema(
         role: {
             type: Number, // 1 = admin, 2 = regular
             required: false,
-            default: 1,
+            default: 2,
         },
-        // verified: {
-        //     type: Boolean,
-        //     required: true,
-        //     default: 2,
-        // },
+        verified: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             required: false
         },
+
+        resetPassword: {
+            type: Boolean || null,
+            required: false,
+            default: false,
+        },
+
+        resetPasswordToken: {
+            type: String || null,
+            required: false,
+            default: false,
+        },
+
+
+        resetPasswordExpire: {
+            type: Date || null,
+            require: false,
+            default: null,
+        }
     },
     { timestamps: true }
 );

@@ -6,6 +6,14 @@ const bcrypt = require("bcrypt");
 const Auth = require("../model/Auth");
 const User = require("../model/User");
 const jsonwebtoken = require("jsonwebtoken");
+const transporter = require("../config/mail")
+const { promisify } = require("util");
+const ejs = require("ejs");
+
+const ejsRenderFile = promisify(ejs.renderFile);
+const crypto = require("crypto");
+const path = require("path");
+const { default: mongoose } = require("mongoose");
 
 class AuthController {
     async login(req, res) {
@@ -100,6 +108,130 @@ class AuthController {
         }
     }
 
+    async sendForgotPasswordEmail(req, res) {
+        try {
+            const { email } = req.body;
+            if (!email || email === "") {
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Recipient email was not provided ");
+            }
+
+            const auth = await Auth.findOne({ email: email }).populate("user");
+
+            if (!auth) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "User not found");
+            }
+
+            const resetToken = crypto.randomBytes(32).toString("hex");
+            auth.resetPasswordToken = resetToken;
+            auth.resetPasswordExpire = Date.now() + 60 * 60 * 1000;
+            auth.resetPassword = true;
+
+            await auth.save();
+
+            const resetURL = path.join(process.env.FRONTEND_URL, "reset-password", resetToken, auth._id.toString());
+            const htmlBody = await ejsRenderFile(path.join(__dirname, "..", "views", "forgot-password.ejs"), {
+                name: auth.user.name,
+                resetURL: resetURL,
+            });
+
+            const result = await transporter.sendMail({
+                from: "bookleaf.com",
+                to: `${auth.user.name} ${email}`,
+                subject: "Forgot Password?",
+                html: htmlBody,
+            });
+
+            if (result.messageId) {
+                return sendResponse(res, HTTP_STATUS.OK, "Successfully requested for resetting password ");
+            }
+            return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Something went wrong!");
+        } catch (error) {
+            console.log(error);
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
+
+    async resetPassword(req, res) {
+        try {
+            const { token, userId, newPassword, confirmPassword } = req.body;
+            console.log("req body: ", req.body)
+
+            const auth = await Auth.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+            if (!auth) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Invalid request");
+            }
+
+            if (auth.resetPasswordExpire < Date.now()) {
+                return sendResponse(res, HTTP_STATUS.GONE, "Expired request");
+            }
+
+            if (auth.resetPasswordToken !== token || auth.resetPassword === false) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Passwords do not match");
+            }
+
+            if (await bcrypt.compare(newPassword, auth.password)) {
+                return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Invalid Token ");
+            }
+
+            if (newPassword !== confirmPassword) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Passwords do not match");
+            }
+
+            if (await bcrypt.compare(newPassword, auth.password)) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Password cannot be same as the old password")
+            }
+
+            //write validations...
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10).then((hash) => {
+                return hash;
+            });
+
+            const result = await Auth.findOneAndUpdate(
+                { _id: new mongoose.Types.ObjectId(userId) },
+                {
+                    password: hashedPassword,
+                    resetPassword: false,
+                    resetPasswordExpire: null,
+                    resetPasswordToken: null,
+                }
+            )
+
+            // write code to save the new password
+
+            if (result.isModified) {
+                return sendResponse(res, HTTP_STATUS.OK, "Successfully updated password");
+            }
+        } catch (error) {
+            console.log(error);
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+        // return sendResponse(res, HTTP_STATUS.OK, "Request is still valid");
+    }
+
+    async validatePasswordResetRequest(req, res) {
+        try {
+            const { token, userId } = req.body;
+
+            const auth = await Auth.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+            if (!auth) {
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Invalid request");
+            }
+
+            if (auth.resetPasswordExpire < Date.now()) {
+                return sendResponse(res, HTTP_STATUS.GONE, "Expired request");
+            }
+
+            if (auth.resetPasswordToken !== token || auth.resetPassword === false) {
+                return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Invalid token");
+            }
+            return sendResponse(res, HTTP_STATUS.OK, "Request is still valid");
+        } catch (error) {
+            console.log(error);
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
 }
+
 
 module.exports = new AuthController();

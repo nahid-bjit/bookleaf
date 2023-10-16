@@ -14,6 +14,7 @@ const AuthRouter = require("./routes/Auth");
 const CartRouter = require("./routes/Cart");
 const TransactionRouter = require("./routes/Transaction");
 const ReviewRouter = require("./routes/Review");
+const MailRouter = require("./routes/Mail");
 
 
 // morgan LogFile configuration
@@ -37,6 +38,7 @@ app.use("/auth", AuthRouter);
 app.use("/cart", CartRouter);
 app.use("/transactions", TransactionRouter);
 app.use("/reviews", ReviewRouter);
+app.use("/mail", MailRouter);
 
 
 // Define your routes and middleware above this catch-all route.
