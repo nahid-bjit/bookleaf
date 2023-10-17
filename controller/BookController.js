@@ -80,25 +80,6 @@ class BookController {
     }
 
 
-    // ## basic getAll  ##
-    // async getAll(req, res) {
-    //     try {
-    //         const books = await BookModel.find({}).populate('reviews'); // Populate the 'reviews' field
-
-    //         if (books.length > 0) {
-    //             const response = {
-    //                 result: books,
-    //                 total: books.length,
-    //             };
-    //             sendResponse(res, HTTP_STATUS.OK, "Successfully received all the books", response);
-    //         } else {
-    //             sendResponse(res, HTTP_STATUS.OK, "No products were found");
-    //         }
-    //     } catch (error) {
-    //         sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
-    //     }
-    // }
-
     async getOneById(req, res) {
         try {
             const { id } = req.params;
@@ -135,6 +116,7 @@ class BookController {
 
 
     async create(req, res) {
+        console.log("request body: ", req.file)
         try {
             const validation = validationResult(req).array();
             if (validation.length > 0) {

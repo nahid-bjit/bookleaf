@@ -3,6 +3,7 @@ const routes = express();
 const { userValidator, bookValidator, getAllValidator, validate } = require("../middleware/validation");
 const BookController = require("../controller/BookController");
 const { isAuthenticated, isAdmin } = require("../middleware/auth");
+const upload = require("../config/files");
 
 
 routes.get("/all",
@@ -12,7 +13,7 @@ routes.get("/all",
 routes.get("/detail/:id", BookController.getOneById);
 //routes.post("/addBook", isAuthenticated, isAdmin, bookValidator.add, BookController.create);
 //routes.post("/add", isAuthenticated, isAdmin, bookValidator.add, BookController.create);
-routes.post("/add", BookController.create);
+routes.post("/add", upload.single("file_to_upload"), BookController.create);
 routes.delete("/delete/:id", BookController.deleteById);
 routes.patch("/update/:id", BookController.updateById);
 // routes.delete("/delete/:id", isAuthenticated, isAdmin, BookController.deleteById);

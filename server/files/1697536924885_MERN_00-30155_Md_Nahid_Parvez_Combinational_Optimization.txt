@@ -1,0 +1,13 @@
+I have computed all the values based on the provided case study as follows:
+
+1. Subquestion 1:
+Answer:
+- Value of A = I
+- Value of B = I - J
+- Value of C = N - S[N]
+
+2. Subquestion 2:
+Answer:
+- Value of D = 10
+- Value of E = 17
+- Value of F = 1
